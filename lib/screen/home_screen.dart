@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 
@@ -8,13 +10,14 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   String outText = '';
   String clearSign = String.fromCharCode(9003);
-  List<String> op = ["+", "-", "×", "÷", '.','='];
+  List<String> op = ["+", "-", "×", "÷", '.', '=', '%'];
   int dotStringCount = 0;
-  String eqString='';
-  String eqStringOpView='';
+  String resulteString = '';
+  String eqStringOpView = '';
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const SizedBox(height: 30,),
-              NumberScreenCalcModel(outText: outText==""?eqStringOpView:outText,eqlText: eqString,),
+              const SizedBox(
+                height: 30,
+              ),
+              NumberScreenCalcModel(
+                outText: outText == "" ? eqStringOpView : outText,
+                eqlText: resulteString,
+              ),
               // NumberScreenCalcModel(outText: eqString),
               const SizedBox(height: 30),
               Expanded(
-                flex:9,
+                flex: 9,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -39,20 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: ButtonNumberModel(
                             title: "√",
-                            onTap: () {},
+                            onTap: () {
+                              sqr();
+                            },
                           ),
                         ),
                         Expanded(
                           child: ButtonNumberModel(
                             title: "x²",
-                            onTap: () {},
+                            onTap: () {
+                              quadrature();
+                            },
                           ),
                         ),
                         Expanded(
                           child: ButtonNumberModel(
-                            title: "±",
+                            title: "M",
                             onTap: () {
-                              onPlusMins();
+                              onMemory();
                             },
                           ),
                         ),
@@ -263,11 +275,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   onTap(String value) {
-
-    eqString="";
-    print("eqString $eqString");
+    resulteString = "";
+    print("eqString $resulteString");
     for (int i = 0; i < op.length; i++) {
       if (outText.isEmpty && value == op[i]) {
         return;
@@ -278,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (int i = 0; i < op.length; i++) {
       if (value == op[i]) {
-        dotStringCount=0;
+        dotStringCount = 0;
         String textNotEnd = outText.substring(0, outText.length - 1);
         print("textNotEnd $textNotEnd");
 //-----------------------------------------------------
@@ -290,10 +300,6 @@ class _HomeScreenState extends State<HomeScreen> {
             textRemoveReplaceOp += value;
             textNotEnd = textRemoveReplaceOp;
             print("y $textRemoveReplaceOp");
-
-
-
-
           }
         }
 //if end string finish  same two op function  no repeat op
@@ -308,45 +314,68 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  onEql(){
-   if(outText.isNotEmpty){
-     Parser p = Parser();
-     Expression exp = p.parse(outText);
-     double eval = exp.evaluate(EvaluationType.REAL, ContextModel());
-     print(" eval $eval");
-     eqString=eval.toString();
-     eqStringOpView=outText;
-     outText="";
-
-     print("eqStringOpView $eqStringOpView");
-     setState(() {
-     });
-   }
-  }
-  onPlusMins(){
-    if(outText.isNotEmpty){
-outText="-$outText";
-      setState(() {
-
-      });
+  sqr() {
+    if (outText.isNotEmpty) {
+      onEql();
+      double d = double.parse(resulteString);
+      outText = "√ (sqr( $d ))";
+      d = sqrt(d);
+      resulteString = d.toString();
+      eqStringOpView = outText;
+      outText = "";
+      print("object");
     }
   }
-  onDot(String value) {
-  String text='';
-  if(dotStringCount<1){
-    text=outText+value;
-    print(text);
-  }else{
-    return;
-  }
-  outText=text;
 
-  dotStringCount++;
-  setState(() { });
+  quadrature() {
+    if (outText.isNotEmpty) {
+      onEql();
+      double d = double.parse(resulteString);
+      outText = "sqr( $d )";
+      d *= d;
+      resulteString = d.toString();
+      eqStringOpView = outText;
+      outText = "";
+      print("object");
+    }
+  }
+
+  onEql() {
+    if (outText.isNotEmpty) {
+      Parser p = Parser();
+      Expression exp = p.parse(outText);
+      double eval = exp.evaluate(EvaluationType.REAL, ContextModel());
+      print(" eval $eval");
+      resulteString = eval.toString();
+      eqStringOpView = outText;
+      outText = "";
+
+      print("eqStringOpView $eqStringOpView");
+      setState(() {});
+    }
+  }
+
+  onMemory() {
+    outText = resulteString;
+    setState(() {});
+  }
+
+  onDot(String value) {
+    String text = '';
+    if (dotStringCount < 1) {
+      text = outText + value;
+      print(text);
+    } else {
+      return;
+    }
+    outText = text;
+
+    dotStringCount++;
+    setState(() {});
   }
 
   onTapBackSpace() {
-    dotStringCount=0;
+    dotStringCount = 0;
     if (outText.isNotEmpty) {
       int l = outText.length;
       --l;
@@ -357,9 +386,9 @@ outText="-$outText";
 
   onTapAC() {
     outText = '';
-    eqString="";
-    eqStringOpView="";
-    dotStringCount=0;
+    resulteString = "";
+    eqStringOpView = "";
+    dotStringCount = 0;
     setState(() {});
   }
 }
