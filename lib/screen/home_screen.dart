@@ -1,4 +1,3 @@
-import 'package:calc_esay_learn_task6/const_value.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 
@@ -9,15 +8,13 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
-/*
-
-لسه = اليساوى و تبديل رمز العمليات وارى بعض
-
- */
 class _HomeScreenState extends State<HomeScreen> {
   String outText = '';
   String clearSign = String.fromCharCode(9003);
+  List<String> op = ["+", "-", "×", "÷", '.','='];
+  int dotStringCount = 0;
+  String eqString='';
+  String eqStringOpView='';
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const Expanded(child: SizedBox()),
-              eqString==""?
-              Expanded(flex: 2, child: NumberScreenCalcModel(outText: outText)):
-              Expanded(flex: 2, child: NumberScreenCalcModel(outText: eqString)),
+              const SizedBox(height: 30,),
+              NumberScreenCalcModel(outText: outText==""?eqStringOpView:outText,eqlText: eqString,),
+              // NumberScreenCalcModel(outText: eqString),
               const SizedBox(height: 30),
               Expanded(
-                flex: 8,
+                flex:9,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -55,14 +51,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: ButtonNumberModel(
                             title: "±",
-                            onTap: () {},
+                            onTap: () {
+                              onPlusMins();
+                            },
                           ),
                         ),
                         Expanded(
                           child: ButtonNumberModel(
                             title: "%",
                             onTap: () {
-                              onTapBackSpace();
+                              onTap('%');
                             },
                           ),
                         ),
@@ -265,14 +263,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<String> op = ["+", "-", "×", "÷", '.','='];
-  int dotStringCount = 0;
-  String eqString='';
+
   onTap(String value) {
 
     eqString="";
     print("eqString $eqString");
-    // print("outTextxxxx Start $outText");
     for (int i = 0; i < op.length; i++) {
       if (outText.isEmpty && value == op[i]) {
         return;
@@ -320,10 +315,21 @@ class _HomeScreenState extends State<HomeScreen> {
      double eval = exp.evaluate(EvaluationType.REAL, ContextModel());
      print(" eval $eval");
      eqString=eval.toString();
+     eqStringOpView=outText;
      outText="";
+
+     print("eqStringOpView $eqStringOpView");
      setState(() {
      });
    }
+  }
+  onPlusMins(){
+    if(outText.isNotEmpty){
+outText="-$outText";
+      setState(() {
+
+      });
+    }
   }
   onDot(String value) {
   String text='';
@@ -333,7 +339,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }else{
     return;
   }
-outText=text;
+  outText=text;
+
   dotStringCount++;
   setState(() { });
   }
@@ -351,6 +358,7 @@ outText=text;
   onTapAC() {
     outText = '';
     eqString="";
+    eqStringOpView="";
     dotStringCount=0;
     setState(() {});
   }
