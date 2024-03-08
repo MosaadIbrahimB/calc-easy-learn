@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String outText = '';
   String clearSign = String.fromCharCode(9003);
-  List<String> op = ["+", "-", "×", "÷", '.', '=', '%'];
+  List<String> op = ["+", "-", "*", "/", '.', '=', '%'];
   int dotStringCount = 0;
   String resulteString = '';
   String eqStringOpView = '';
